@@ -78,11 +78,10 @@ def cursor(stdscr, pos_x, pos_y, X_center):
 
 def ajuda(stdscr):
         stdscr.clear()
-        stdscr.addstr(1, 1, 'Pressione Q para sair e H para ajuda')
-        stdscr.addstr(2, 1, 'Para mudar a posicao, use as teclas A, D, S, W')
-        stdscr.addstr(3, 1, 'Para definir uma posicao, use a tecla L')
-        stdscr.addstr(4, 1, 'Para reiniciar a partida, digite Y')
-        stdscr.addstr(5, 1, 'Pressione ESPAÇO para sair desta tela')
+        stdscr.addstr(1, 1, 'Para mudar a posicao, use as teclas A, D, S, W')
+        stdscr.addstr(2, 1, 'Para definir uma posicao, use a tecla L')
+        stdscr.addstr(3, 1, 'Para reiniciar a partida, digite Y')
+        stdscr.addstr(4, 1, 'Pressione ESPAÇO para sair desta tela')
         stdscr.refresh()
 
 
