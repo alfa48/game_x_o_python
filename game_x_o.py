@@ -13,6 +13,7 @@ def welcome_screen(stdscr):
     stdscr.clear()
     stdscr.addstr(1, 1, 'Bem vindo ao jogo X_O.')
     stdscr.addstr(2, 1, 'Pressione q para sair e h para obter ajuda.')
+    stdscr.addstr(3, 1, 'Pressione r para reiniciar.')
     stdscr.addstr(16, 1, 'Create by Manuel Andre')
     stdscr.refresh()
 
@@ -81,31 +82,104 @@ def help(stdscr):
         stdscr.addstr(4, 1, 'Pressione ESPAÇO para sair desta tela')
         stdscr.refresh()
 
+def debug(stdscr, pos_x, pos_y):
+        stdscr.addstr(17, 1, f"pos_x: {pos_x}, pos_y: {pos_y}")
+
+def gamer(pos_x, pos_y, positions):
+    if positions[pos_y][pos_x] == ' ':
+        positions[pos_y][pos_x] = 'X'
+        return True, positions
+    return False, positions
 
 
+def robot(positions):
+    empty = []
+    for i in range(0, 3):
+        for j in range(0, 3):
+            if positions[j][i] == " ":
+                empty.append([j, i])
+    n_choese = len(empty)
+    if n_choese != 0:
+        j, i = empty[randint(0, n_choese - 1)]
+        positions[j][i] = "O"
+    return (positions)
+
+def is_table_full (positions):
+    for row  in positions:
+        if ' ' in row:
+            return False
+    return True
+
+def won(positions, gamer):
+    # linhas
+    for row in positions:
+        if all(cell == gamer for cell in row):
+            return gamer, True
+    # colunas
+    for col in range(3):
+        if all(row[col] == gamer for row in positions):
+            return gamer, True
+    # diagonal principal
+    if all(positions[i][i] == gamer for i in range(3)):
+        return gamer, True
+    # diagonal secundária
+    if all(positions[i][2 - i] == gamer for i in range(3)):
+        return gamer, True
+    return gamer, False
+
+def game_over(stdscr, won):
+        if (won == 'Empate'):
+            stdscr.addstr(6, 1, '..%s ...' % won)
+        else:
+            stdscr.addstr(6, 1, '%s venceu...' % won)
+        stdscr.refresh()
+
+def reboot(stdscr):
+    positions = [
+                    [' ', ' ', ' '],
+                    [' ', ' ', ' '],
+                    [' ', ' ', ' ']
+                ]
+    pos_x, pos_y = 0, 0
+    winner, won_o, won_x = ' ', False, False
+    stdscr.clear()
+    return positions, pos_x, pos_y, winner, won_o, won_x
 
 def main(stdscr):
 
-    init_screen(stdscr)
     width = stdscr.getmaxyx()[1]
-    x_center = (width) // 2
-    position = [[' ', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']]
-    pos_x, pos_y = 0, 0
+    x_center = (width - 1) // 2
+    positions, pos_x, pos_y, winner, won_o, won_x = reboot(stdscr)
+    init_screen(stdscr)
 
     while (True):
         key = stdscr.getkey()
-        if key == 'q':
+        if key == 'r':
+            positions, pos_x, pos_y, winner, won_o, won_x = reboot(stdscr)
+            pass
+        if key == ('q' or is_table_full(positions)):
             break
         if (key in ['a', 'd', 'w', 's']):
             pos_x, pos_y = space_of_table(pos_x, pos_y, key)
+        if (key == '\n'):
+            played, positions = gamer (pos_x, pos_y, positions)
+            if played:
+                positions = robot(positions)
+            winner, won_x = won(positions, 'X')
+            if won_x == False:
+                winner, won_o = won(positions, 'O')
         if key == 'h':
             help(stdscr)
         else:
-            draw_table(stdscr, position, x_center)
-            #stdscr.move(pos_x, pos_y)
+            draw_table(stdscr, positions, x_center)
             cursor(stdscr, pos_x, pos_y, x_center)
-
-        #pass
+            if won_x or won_o:
+                game_over(stdscr, winner)
+            if is_table_full(positions):
+                game_over(stdscr, "Empate")
+        #   stdscr.move(pos_x, pos_y)
+        #pos_x, pos_y = 2, 2;
+            #debug(stdscr, pos_x, str(pos_y))
 
 
 if __name__ == "__main__":
